@@ -1,0 +1,17 @@
+#! /usr/bin/octave -q
+orgdata=read_complex_binary("org.dat");
+save -mat-binary orgdata.mat orgdata
+corrdata=read_int_binary("corr.dat");
+save -mat-binary corrdata.mat corrdata
+longdata=read_complex_binary("long.dat");
+save -mat-binary longdata.mat longdata
+lgthdata=read_float_binary("lgth.dat");
+save -mat-binary lgthdata.mat lgthdata
+shortdata=read_complex_binary("short.dat");
+save -mat-binary shortdata.mat shortdata
+rxshthdata=read_float_binary("rxshth.dat");
+save -mat-binary rxshthdata.mat rxshthdata
+freqoffdata=read_float_binary("freqoff.dat");
+save -mat-binary freqoffdata.mat freqoffdata
+gaindata=read_float_binary("gain.dat");
+save -mat-binary gaindata.mat gaindata

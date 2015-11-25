@@ -1,12 +1,12 @@
 function [stg1succ, stg2succ, stg3succ, SuccInd, FosEst] = tPeakDetect(SynCorr, abs_SynCorr,...
     data, index, ComShPNseq, LgPNseq, pkthre, LongSeqThres)
 
-VarDB = readVariables;
+%VarDB = readVariables;
 % pnSeqLen = VarDB.pnSeqLen; 
 % short_seq_rep = VarDB.short_seq_rep; % NOTE: keep it even number
 % longPnSeqLen = VarDB.longPnSeqLen;
-data_len = VarDB.data_len;
-ShortRepThres = VarDB.ShortRepThres;
+%data_len = VarDB.data_len;
+%ShortRepThres = VarDB.ShortRepThres;
 noofsamples = length(data);
 %LongSeqThres = VarDB.LongSeqThres;
 % Length of short sequence used for synchronization
@@ -17,11 +17,15 @@ global short_seq_rep;
 
 % Length of long sequence
 global longPnSeqLen;
+global ShortRepThres;
+global data_len;
 global orgdata;
 global datablockcount;
 global DataPNseq;
 global dataSeqLen;
 global BERinfo;
+global next_expected_peak;
+global correctpkcounter;
 % if short_seq_rep<4 || rem(short_seq_rep, 2)>0
 %     error('short_seq_rep should be >= 4 and an even number');
 % end
@@ -34,7 +38,7 @@ avg_freq_offset2 = -100;
 thre_factor = 0.9;
 stg1succ_count = 0;
 FosEst = 0;
-indexoffset = 3340;
+indexoffset = 45433;
 pilot_ind = 8;
 
 if index > (short_seq_rep-1)*pnSeqLen + data_len
@@ -45,9 +49,11 @@ if index > (short_seq_rep-1)*pnSeqLen + data_len
         end
         tempSParr(rep) = abs_SynCorr(index-(rep-1)*pnSeqLen);
     end
+    %{
     if mod(index-indexoffset, 1920) == 0
         disp(num2str([stg1succ_count,  sort(tempSParr), pkthre]));
     end
+    %}
     if stg1succ_count < ceil(ShortRepThres) % approx frc% of the peaks are detected
         stg1succ = 0;
     %elseif sum(PkInfo) < short_seq_rep
@@ -96,11 +102,10 @@ if index > (short_seq_rep-1)*pnSeqLen + data_len
             %%%%%%%%%%%% ORBIT %%%%%%%%%%%%%%
             %LongSeqThres = 60;
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            if abs(LongCorr)>LongSeqThres
-                stg3succ = abs(LongCorr);
-            end
-            if stg3succ > 0
-                msg = ['### ', num2str(index), ': ',...
+            stg3succ = abs(LongCorr);
+            if stg3succ > LongSeqThres
+                correctpkcounter = correctpkcounter+1;
+                msg = [num2str(correctpkcounter),'### ', num2str(index), ': ',...
                 num2str(index+1920), ': ', num2str(f_os_corr),...
                 ': ', num2str(abs(LongCorr)), ': ', num2str(stg1succ_count),...
                 ': ',num2str(LongSeqThres), ': ', num2str(mean(abs(orgdata(index-100:index)))*320/sqrt(12)),...
@@ -109,6 +114,7 @@ if index > (short_seq_rep-1)*pnSeqLen + data_len
                 if mod(index-indexoffset, 1920) ~= 0
                     disp('***False***');
                 end
+                next_expected_peak = index+1920;
                  %############## finding the data bits #####################
                 phaseoffset = 0;
                 bitinfo = [];
@@ -182,6 +188,8 @@ if index > (short_seq_rep-1)*pnSeqLen + data_len
                     BERinfo(2,datablockcount) = BitErrorRate(datablockcount);
                 end
                 %##########################################################
+            elseif index == next_expected_peak
+                disp('*******MISSED THE PEAK*******');
             end
         end
     end

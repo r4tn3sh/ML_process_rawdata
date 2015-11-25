@@ -21,6 +21,10 @@ global DataPNseq;
 global dataSeqLen;
 global BERinfo;
 global LongThreshold;
+global ShortThreshold;
+global ShortPkThres;
+global ShortRepThres;
+global data_len;
 
 pnSeqLen = 40;
 short_seq_rep = 8;
@@ -45,6 +49,8 @@ P_sync = VarDB.P_sync;
 total_pk=0; % overall number of peaks
 total_mp=0; % total missed peaks
 total_ep=0; % total extra peaks
+global correctpkcounter;
+correctpkcounter = 0;
 for loop=1:1
     disp(loop);
     disp('########################################')
@@ -105,9 +111,16 @@ for loop=1:1
     pk_threshold = short_seq_rep*(pnSeqLen^2)*0.7;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%% Read the data file
-    load('/home/ratensh/simulationORBITdata/orgdata.mat');
-    rxdata = (orgdata(1510000:2500000))';
-    
+    load('/home/ratensh/simulationORBITdata/data/orgdata.mat');
+    tempsize = length(orgdata);
+    %{
+    if tempsize > 500000
+        rxdata = (orgdata(tempsize-500000:tempsize))';
+    else
+        rxdata = (orgdata(1:tempsize))';
+    end
+    %}
+    rxdata = (orgdata(1:tempsize))';
     noofsamples = length(rxdata);
     %%%%%%% Create short PN sequence %%%%%%%%
     for i = 1:short_seq_rep

@@ -1,0 +1,13 @@
+corrdata=read_int_binary("corr.dat");
+shortdata=read_complex_binary("short.dat");
+shthdata=read_float_binary("shth.dat");
+rxshthdata=read_float_binary("rxshth.dat");
+maxval = max(abs(shortdata));
+figure;
+hold on;
+plot(maxval*abs(corrdata),'g');
+plot(abs(shortdata),'b');
+%plot(abs(shthdata),'r');
+plot(abs(rxshthdata),'k');
+hold off;
+%clear;

@@ -1,0 +1,11 @@
+corrdata=read_int_binary("corr.dat");
+longdata=read_complex_binary("long.dat");
+lgthdata=read_float_binary("lgth.dat");
+maxval = max(abs(longdata));
+figure;
+hold on;
+plot(maxval*abs(corrdata),'g');
+plot(abs(longdata),'b');
+plot(abs(lgthdata),'r');
+hold off;
+%clear;

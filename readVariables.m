@@ -1,5 +1,6 @@
 function [data] = readVariables()
 
+global ShortPkThres;
 % Length of short sequence used for synchronization
 global pnSeqLen;
 
@@ -9,6 +10,8 @@ global short_seq_rep;
 % Length of long sequence
 global longPnSeqLen;
 global f_os;
+global ShortRepThres;
+global data_len;
 % FFT length
 fft_len=64;
 % CP length
