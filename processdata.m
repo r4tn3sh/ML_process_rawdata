@@ -3,14 +3,44 @@ clear;
 close all;
 
 % PARAMETERS NEEDED TO BE ADJUSTED
-totallen=1280+240;
-load('path to/longdata.mat')
-load('path to/lgthdata.mat')
-load('path to/corrdata.mat')
+command = 'cp /home/ratensh/ONRDATACOLLECTION/datacollection/1_pair/sync_data/5_4_60/* /home/ratensh/simulationORBITdata/data/';
+[status,cmdout] = system(command);
+command = '/home/ratensh/simulationORBITdata/data/generatemat';
+[status,cmdout] = system(command);
+configdata=textread('/home/ratensh/simulationORBITdata/data/common_config','%s');
+configlen = length(configdata);
+for i=1:configlen
+    if strcmp(configdata{i},'mode')==1
+        mode=str2num(configdata{i+1});
+    elseif strcmp(configdata{i},'shseq_len')==1
+        shseq_len=str2num(configdata{i+1});
+    elseif strcmp(configdata{i},'shseq_rep')==1
+        shseq_rep=str2num(configdata{i+1});
+    elseif strcmp(configdata{i},'lgseq_len')==1
+        lgseq_len=str2num(configdata{i+1});
+    elseif strcmp(configdata{i},'dataseq_len')==1
+        dataseq_len=str2num(configdata{i+1});
+    end
+end
+seq_len = shseq_len*shseq_rep+lgseq_len;
+totallen=1280 + seq_len;
+load('/home/ratensh/simulationORBITdata/data/longdata.mat')
+load('/home/ratensh/simulationORBITdata/data/lgthdata.mat')
+load('/home/ratensh/simulationORBITdata/data/corrdata.mat')
+load('/home/ratensh/simulationORBITdata/data/gaindata.mat')
+load('/home/ratensh/simulationORBITdata/data/orgdata.mat')
+configdata=textread('/home/ratensh/simulationORBITdata/data/common_config','%s');
+configlen = length(configdata);
+for i=1:configlen
+    if strcmp(configdata{i},'mode')==1
+        mode=str2num(configdata{i+1});
+        break;
+    end
+end
 
 
 datalen = length(corrdata);
-dataoffset = ceil(0.3*datalen); 
+dataoffset = ceil(0.1*datalen); 
 totalpeaks = sum(corrdata(dataoffset:datalen));
 previndex=0;
 currindex=0;
@@ -73,6 +103,7 @@ falsepeakcnt=sum(flag)+initfalsecnt;
 correctpeakcnt = sum(correctpeakflag);
 maxcorr = 1.2*max(abs(longdata));
 hold on;
+%plot(maxcorr*corrdata,'g');
 plot(maxcorr*flag,'r');
 plot(maxcorr*correctpeakflag,'g');
 plot(abs(longdata),'b');
@@ -82,3 +113,5 @@ str = sprintf('False alarm rate: %f',falsepeakcnt/(totalpeaks-doublepeakcnt));
 disp(str);
 str = sprintf('Missed rate: %f',missedpeakcnt/((datalen-dataoffset)/totallen));
 disp(str);
+
+
